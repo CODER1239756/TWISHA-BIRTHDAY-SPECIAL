@@ -1,4 +1,5 @@
 import { Canvas } from '@react-three/fiber';
+import ThoughtSeeds from './ThoughtSeeds';
 import { NeutralToneMapping } from 'three';
 import Backdrop from './Backdrop';
 import CameraRig from './CameraRig';
@@ -43,6 +44,7 @@ export default function GardenCanvas() {
 
         <Backdrop />
         <Ground />
+        <ThoughtSeeds />
         <CameraRig />
       </Canvas>
     </div>
