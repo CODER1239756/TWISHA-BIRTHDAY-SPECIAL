@@ -54,8 +54,9 @@ button, input { font: inherit; color: inherit; }
 .hero {
   position: absolute;
   top: calc(var(--safe-top) + var(--gutter));
-  left: calc(var(--safe-left) + var(--gutter) + var(--rail-w) + var(--gutter));
-  right: calc(var(--safe-right) + var(--gutter));
+  left: 0;
+  right: 0;
+  padding-inline: calc(var(--safe-left) + var(--gutter));
   text-align: center;
   text-shadow: var(--shadow-text);
   pointer-events: none;
@@ -187,6 +188,23 @@ button, input { font: inherit; color: inherit; }
   font-style: italic;
   color: var(--ink);
   text-shadow: var(--shadow-text);
+}
+.submitted-thought {
+  padding: 12px 18px;
+  border-radius: 18px;
+  overflow-wrap: anywhere;
+  text-shadow: var(--shadow-text);
+}
+.submitted-thought .tag {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--accent);
+}
+.submitted-thought p {
+  margin: 0;
+  white-space: pre-wrap;
 }
 
 /* ---------- Growth card + quote ---------- */
