@@ -1,11 +1,6 @@
-import type { ReactNode } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 
-/**
- * Stage 1 UI shell. Everything here is a visual preview: no control does
- * anything yet. Controls are real `disabled` elements (not click handlers
- * that silently do nothing) so assistive tech and iPad users get an honest
- * signal. Thought submission and growth arrive in Stage 3.
- */
+/** Stage 1 garden UI. Thought entry works locally; persistence and plant growth come later. */
 
 const icon = (children: ReactNode) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -27,6 +22,22 @@ const ACTIVE = 'Grow';
 const CHIPS = ['Thought', 'Memory', 'Happy', 'Sad', 'Idea', 'Dream', 'Random'];
 
 export default function GlassShell() {
+  const [thought, setThought] = useState('');
+  const [latestThought, setLatestThought] = useState('');
+  const [notice, setNotice] = useState('');
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const value = thought.trim();
+    if (!value) {
+      setNotice('Write a thought first.');
+      return;
+    }
+    setLatestThought(value);
+    setThought('');
+    setNotice('Added to this session. Thoughts are not saved after you leave yet.');
+  }
+
   return (
     <div className="shell">
       <header className="hero">
@@ -69,18 +80,29 @@ export default function GlassShell() {
             </button>
           ))}
         </div>
-        <form className="glass thought-form" onSubmit={(e) => e.preventDefault()}>
+        <form className="glass thought-form" onSubmit={handleSubmit}>
           <input
             type="text"
-            disabled
+            value={thought}
+            onChange={(event) => {
+              setThought(event.target.value);
+              if (notice) setNotice('');
+            }}
             placeholder="Feed the plant with your imagination…"
-            aria-label="Thought input (not available yet)"
+            aria-label="Write a thought"
+            autoComplete="off"
           />
-          <button type="submit" className="send" disabled aria-label="Plant thought (not available yet)">
+          <button type="submit" className="send" aria-label="Add thought">
             {icon(<path d="M5 12h13M13 6l6 6-6 6" />)}
           </button>
         </form>
-        <p className="preview-note">Preview only. Planting thoughts is not available yet.</p>
+        {notice && <p className="preview-note" role="status">{notice}</p>}
+        {latestThought && (
+          <div className="glass submitted-thought" aria-live="polite">
+            <span className="tag">Latest thought</span>
+            <p>{latestThought}</p>
+          </div>
+        )}
       </div>
     </div>
   );
