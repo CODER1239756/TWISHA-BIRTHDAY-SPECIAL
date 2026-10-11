@@ -35,7 +35,8 @@ export default function GlassShell() {
     }
     setLatestThought(value);
     setThought('');
-    setNotice('Added to this session. Thoughts are not saved after you leave yet.');
+    setNotice('Your thought is taking root in the garden.');
+    window.dispatchEvent(new CustomEvent('garden:thought-seed', { detail: { text: value } }));
   }
 
   return (
