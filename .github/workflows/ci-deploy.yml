@@ -60,10 +60,11 @@ jobs:
           SIZE=$(du -sb dist | cut -f1)
           [ "$SIZE" -le 15728640 ] || { echo "::error::dist is over 15 MB"; exit 1; }
 
-      # Informational: reports known vulnerabilities but does not block deploy.
+      # Informational: audits only what ships to visitors (--omit=dev); test tooling
+      # such as vitest is excluded. Never blocks the deploy.
       - name: Audit - dependency vulnerabilities
         continue-on-error: true
-        run: npm audit --audit-level=high
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Save resolved lockfile
         uses: actions/upload-artifact@v4
