@@ -1,0 +1,277 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: linear-gradient(to top, var(--sky-horizon), var(--sky-mid) 45%, var(--sky-top));
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---------- 3D stage ---------- */
+.stage {
+  position: fixed;
+  inset: 0;
+  touch-action: none; /* the scene owns touch; the page never scrolls */
+}
+.stage canvas { display: block; }
+
+/* ---------- UI layer ---------- */
+.shell {
+  position: fixed;
+  inset: 0;
+  pointer-events: none; /* clicks fall through to the scene... */
+  padding:
+    calc(var(--safe-top) + var(--gutter))
+    calc(var(--safe-right) + var(--gutter))
+    calc(var(--safe-bottom) + var(--gutter))
+    calc(var(--safe-left) + var(--gutter));
+}
+.shell > * { pointer-events: auto; } /* ...except on the UI itself */
+
+.glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Inert controls look finished but are clearly not interactive. */
+button:disabled { cursor: default; }
+button, input { font: inherit; color: inherit; }
+
+/* ---------- Hero ---------- */
+.hero {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--gutter));
+  left: calc(var(--safe-left) + var(--gutter) + var(--rail-w) + var(--gutter));
+  right: calc(var(--safe-right) + var(--gutter));
+  text-align: center;
+  text-shadow: var(--shadow-text);
+  pointer-events: none;
+}
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 6.2vw, 4.4rem);
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+.hero p {
+  margin: 0.35em 0 0;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+  color: var(--ink);
+}
+
+/* ---------- Left rail ---------- */
+.rail {
+  position: absolute;
+  left: calc(var(--safe-left) + var(--gutter));
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--rail-w);
+  padding: 10px;
+  border-radius: var(--radius-lg);
+  display: none;
+}
+.rail ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.nav-item {
+  width: 100%;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 16px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-shadow: var(--shadow-text);
+}
+.nav-item svg { width: 24px; height: 24px; flex: none; }
+.nav-item[aria-current='page'] {
+  background: rgba(255, 233, 190, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(255, 236, 200, 0.5);
+  color: #fff;
+}
+.nav-item:disabled:not([aria-current]) { opacity: 0.86; }
+
+/* ---------- Composer (chips + input) ---------- */
+.composer {
+  position: absolute;
+  left: calc(var(--safe-left) + var(--gutter) + var(--rail-w) + var(--gutter));
+  right: calc(var(--safe-right) + var(--gutter) + var(--side-w, 0px));
+  bottom: calc(var(--safe-bottom) + var(--gutter));
+  max-width: 760px;
+  margin-inline: auto;
+  display: grid;
+  gap: 10px;
+}
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none;
+  min-height: 40px;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-shadow: var(--shadow-text);
+  /* No backdrop blur here: inside a scrolling row it clips into a visible
+     rectangle. A tinted fill reads as glass at this size. */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: linear-gradient(145deg, rgba(58, 38, 22, 0.4), rgba(255, 236, 205, 0.2));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3); /* the big glass shadow would clip into a band */
+}
+.chip:disabled { opacity: 0.95; }
+/* Centre when it fits, scroll from the left edge when it doesn't. */
+.chip:first-child { margin-left: auto; }
+.chip:last-child { margin-right: auto; }
+
+.thought-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 58px;
+  padding: 6px 8px 6px 22px;
+  border-radius: var(--radius-pill);
+}
+.thought-form input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-size: 1.1rem; /* 16px+ stops iOS Safari zooming on focus */
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+.thought-form input::placeholder { color: var(--ink-soft); opacity: 1; }
+.thought-form .send {
+  flex: none;
+  width: var(--tap);
+  height: var(--tap);
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 224, 160, 0.3);
+}
+.thought-form .send svg { width: 22px; height: 22px; }
+.preview-note {
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--ink);
+  text-shadow: var(--shadow-text);
+}
+
+/* ---------- Growth card + quote ---------- */
+.growth {
+  position: absolute;
+  right: calc(var(--safe-right) + var(--gutter));
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(280px, 26vw);
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  display: none;
+}
+.growth h2 { margin: 0 0 10px; font-size: 1.3rem; font-weight: 600; }
+.growth .tag {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 1px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--accent);
+}
+.growth .bar { height: 6px; border-radius: 3px; background: rgba(255, 248, 234, 0.25); overflow: hidden; }
+.growth .bar span { display: block; width: 38%; height: 100%; background: var(--accent); border-radius: 3px; }
+.growth p { margin: 10px 0 0; font-size: 0.98rem; color: var(--ink-soft); }
+
+.quote {
+  position: absolute;
+  right: calc(var(--safe-right) + var(--gutter));
+  bottom: calc(var(--safe-bottom) + var(--gutter) + 8px);
+  max-width: 250px;
+  margin: 0;
+  text-align: right;
+  font-style: italic;
+  font-size: 1.1rem;
+  text-shadow: var(--shadow-text);
+  display: none;
+}
+
+/* ---------- Responsive ---------- */
+
+/* Tablet portrait and up: icon rail with small labels */
+@media (min-width: 600px) and (max-width: 999px) {
+  .rail { display: block; }
+  .nav-item { flex-direction: column; gap: 2px; padding: 8px 2px; font-size: 0.9rem; }
+}
+
+/* Landscape tablet / desktop: full rail */
+@media (min-width: 1000px) {
+  .rail { display: block; }
+}
+
+/* Room for the side cards once the screen is wide enough */
+@media (min-width: 1000px) {
+  .composer { --side-w: min(280px, 26vw); }
+  .growth { display: block; }
+  .quote { display: block; }
+}
+@media (min-width: 1000px) and (max-width: 1279px) {
+  .quote { display: none; } /* too tight beside the composer on 10-11" iPads */
+}
+
+/* Phones: bottom tab bar replaces the rail */
+@media (max-width: 599px) {
+  .rail {
+    display: block;
+    top: auto;
+    transform: none;
+    left: calc(var(--safe-left) + var(--gutter));
+    right: calc(var(--safe-right) + var(--gutter));
+    bottom: calc(var(--safe-bottom) + var(--gutter));
+    width: auto;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+  }
+  .rail ul { grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; }
+  .nav-item { flex-direction: column; gap: 0; padding: 6px 0; font-size: 0.72rem; border-radius: var(--radius-pill); }
+  .nav-item svg { width: 20px; height: 20px; }
+  .composer { bottom: calc(var(--safe-bottom) + var(--gutter) + 64px); }
+}
+
+/* Short landscape screens (phones sideways): keep the scene visible */
+@media (max-height: 520px) {
+  .hero p, .preview-note { display: none; }
+  .hero h1 { font-size: 1.9rem; }
+}
