@@ -92,6 +92,8 @@ export default function GlassShell() {
             placeholder="Feed the plant with your imagination…"
             aria-label="Write a thought"
             autoComplete="off"
+            maxLength={280}
+            enterKeyHint="send"
           />
           <button type="submit" className="send" aria-label="Add thought">
             {icon(<path d="M5 12h13M13 6l6 6-6 6" />)}

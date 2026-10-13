@@ -52,6 +52,17 @@ jobs:
           fi
           grep -q "$BASE" dist/index.html || { echo "::error::$BASE not found in dist/index.html"; exit 1; }
 
+      # Every script/stylesheet the built page asks for must exist in dist/.
+      # Catches "deployed fine, page blank" caused by missing or misplaced assets.
+      - name: Audit - referenced assets exist
+        run: |
+          BASE="/${{ github.event.repository.name }}/"
+          [ "${{ github.event.repository.name }}" = "${{ github.repository_owner }}.github.io" ] && BASE="/"
+          grep -Eo '(src|href)="[^"]*assets/[^"]*"' dist/index.html | sed -E 's/^(src|href)="//; s/"$//' | while read -r url; do
+            file="dist/${url#"$BASE"}"
+            [ -f "$file" ] && echo "ok  $url" || { echo "::error::missing $file for $url"; exit 1; }
+          done
+
       # First-load budget from the plan: about 15 MB. Fails above it.
       - name: Audit - build size budget
         run: |

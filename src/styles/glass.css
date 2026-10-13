@@ -293,3 +293,25 @@ button, input { font: inherit; color: inherit; }
   .hero p, .preview-note { display: none; }
   .hero h1 { font-size: 1.9rem; }
 }
+
+/* ---------- Failure and loading states ---------- */
+.boot-message {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding: 24px;
+  text-align: center;
+  font-size: 1.3rem;
+  text-shadow: var(--shadow-text);
+}
+.scene-fallback {
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  padding: 24px;
+  text-align: center;
+  text-shadow: var(--shadow-text);
+  pointer-events: none;
+}
+.scene-fallback p { margin: 0; }

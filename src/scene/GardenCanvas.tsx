@@ -8,7 +8,22 @@ import { PALETTE, SUN_DIR } from './palette';
 
 const SUN_POS: [number, number, number] = [SUN_DIR.x * 80, SUN_DIR.y * 80, SUN_DIR.z * 80];
 
+/** True when the browser can create a WebGL context at all. */
+function webglAvailable(): boolean {
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2') || c.getContext('webgl');
+    // Release the probe context so it doesn't count against the browser's limit.
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    return !!gl;
+  } catch {
+    return false;
+  }
+}
+
 export default function GardenCanvas() {
+  // Throwing here is caught by the boundary in App, which keeps the UI visible.
+  if (!webglAvailable()) throw new Error('WebGL is not available in this browser');
   return (
     <div className="stage" aria-hidden="true">
       <Canvas
