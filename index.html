@@ -18,10 +18,16 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap"
       rel="stylesheet"
     />
+    <!-- Paint the sky before any script runs, so a slow or failed load is never a white page. -->
+    <style>
+      html, body { margin: 0; min-height: 100%; background: linear-gradient(to top, #f6c690, #d9d2d8 45%, #6f9bc9); }
+      #root > .boot-message { font: 500 1.3rem Georgia, serif; color: #fff8ea; text-align: center; padding: 40vh 24px 0; text-shadow: 0 1px 12px rgba(60,32,8,.55); }
+    </style>
     <title>Twisha's Garden</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="boot-message">Growing the garden…</div></div>
+    <noscript><div class="boot-message">Twisha's Garden needs JavaScript to grow.</div></noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
